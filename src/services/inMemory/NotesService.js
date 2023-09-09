@@ -1,68 +1,78 @@
 const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
+const { Pool } = require('pg');
+const mapDBToModel = require('../../utils');
 
 class NotesService {
   constructor() {
     this._notes = [];
+    this._pool = new Pool()
   }
 
-  addNote({ title, body, tags }) {
+  async addNote({ title, body, tags }) {
     const id = nanoid(16);
     const createdAt = new Date().toISOString();
     const updatedAt = createdAt;
 
-    const newNote = {
-      title, tags, body, id, createdAt, updatedAt,
-    };
+    const query = {
+      text : 'INSERT INTO notes VALUES($1,$2,$3,$4,$5,$6) RETURNING id',
+      values : [id, title, body, tags, createdAt, updatedAt]
+    }
 
-    this._notes.push(newNote);
+    const result = await this._pool.query(query)
 
-    const isSuccess = this._notes.filter((note) => note.id === id).length > 0;
-
-    if (!isSuccess) {
+    if (!result.rows[0].id) {
       throw new InvariantError('Catatan gagal ditambahkan');
     }
-
-    return id;
+    return result.rows[0].id
   }
 
-  getNotes() {
-    return this._notes;
+  async getNotes() {
+    const result = await this._pool.query('SELECT * FROM notes');
+    return result.rows.map(mapDBToModel)
   }
 
-  getNoteById(id) {
-    const note = this._notes.filter((n) => n.id === id)[0];
-    if (!note) {
+  async getNoteById(id) {
+    const query = {
+      text : 'SELECT * FROM notes WHERE id = $1',
+      values : [id]
+    }
+    const note = await this._pool.query(query)
+    if (!note.rows.length) {
       throw new NotFoundError('Catatan tidak ditemukan');
     }
-    return note;
+    return note.rows.map(mapDBToModel)[0];
   }
 
   editNoteById(id, { title, body, tags }) {
-    const index = this._notes.findIndex((note) => note.id === id);
+    const updatedAt = new Date().toISOString();
+    const query = {
+      text : 'UPDATE notes SET title = $1, body = $2, tags = $3, updatedAt = $4 WHERE id = $5',
+      values : [title, body, tags, updatedAt, id]
+    }
+    const index = this._pool.query(query)
 
-    if (index === -1) {
+    if (!index.rows.length) {
       throw new NotFoundError('Gagal memperbarui catatan. Id tidak ditemukan');
     }
-
-    const updatedAt = new Date().toISOString();
-
-    this._notes[index] = {
-      ...this._notes[index],
-      title,
-      tags,
-      body,
-      updatedAt,
-    };
+    const $$query = {
+      text : 'SELECT * FROM notes WHERE id = $1',
+      values : [id]
+    }
+    const find = this._pool.query($$query)
+    return find.rows.map(mapDBToModel)[0]
   }
 
   deleteNoteById(id) {
-    const index = this._notes.findIndex((note) => note.id === id);
-    if (index === -1) {
-      throw new NotFoundError('Catatan gagal dihapus. Id tidak ditemukan');
+    const query = {
+      text : 'DELETE FROM notes WHERE id = $1',
+      values : [id]
     }
-    this._notes.splice(index, 1);
+    const index = this._pool.query(query)
+    if (!index.rows.length) {
+      throw new NotFoundError('Catatan gagal dihapus. Id tidak ditemukan');
+    } 
   }
 }
 

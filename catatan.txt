@@ -1,0 +1,11 @@
+node-pg-migrate => 
+Runner script tersebut digunakan untuk menjalan perintah-perintah migrate seperti create, up, down, dan undo. Berikut fungsi-fungsi dari perintah tersebut:
+
+migrate create ‘<migration name>’: Digunakan untuk membuat berkas migration baru.
+migrate up:  Digunakan untuk menjalankan seluruh up migration yang belum dijalankan.
+migrate down: Digunakan untuk menjalankan satu down migration dari keadaan saat ini.
+migrate redo: Digunakan untuk menjalankan ulang migration sebelumnya (menjalankan down migration kemudian up migration).
+bisa create table menggunakan javascript, tidak perlu menggunakan query didatabase lagi, dan menjadi lebih aman karena semua history terekam.
+
+npm run migrate create "create table notes" => membuat table baru
+Angka yang tertulis pada awal nama berkas migrasi adalah waktu epoch, jumlah milidetik yang terus bertambah sejak 1 Januari 1970. Setiap kali membuat migrasi angkanya akan terus bertambah, sehingga berkas migrasi yang Anda buat akan memiliki nilai berbeda di bagian awal nama berkasnya.
