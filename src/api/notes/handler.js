@@ -1,3 +1,6 @@
+/* eslint-disable comma-dangle */
+/* eslint-disable space-before-function-paren */
+/* eslint-disable semi */
 const ClientError = require('../../exceptions/ClientError');
 
 class NotesHandler {

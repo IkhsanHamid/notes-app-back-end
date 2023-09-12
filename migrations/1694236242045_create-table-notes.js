@@ -1,3 +1,7 @@
+/* eslint-disable semi */
+/* eslint-disable comma-dangle */
+/* eslint-disable key-spacing */
+/* eslint-disable indent */
 /* eslint-disable camelcase */
 exports.up = pgm => {
     pgm.createTable('notes', {

@@ -1,12 +1,18 @@
+/* eslint-disable eol-last */
+/* eslint-disable no-multiple-empty-lines */
+/* eslint-disable no-trailing-spaces */
+/* eslint-disable semi */
+/* eslint-disable comma-dangle */
+/* eslint-disable indent */
 const routes = (handler) => [
     {
       method: 'POST',
-      path: '/Postnotes',
+      path: '/notes',
       handler: handler.postNoteHandler,
     },
     {
       method: 'GET',
-      path: '/Getnotes',
+      path: '/notes',
       handler: handler.getNotesHandler,
     },
     {
@@ -16,12 +22,12 @@ const routes = (handler) => [
     },
     {
       method: 'PUT',
-      path: '/Editnotes/{id}',
+      path: '/Putnotes/{id}',
       handler: handler.putNoteByIdHandler,
     },
     {
       method: 'DELETE',
-      path: '/Delnotes/{id}',
+      path: '/notes/{id}',
       handler: handler.deleteNoteByIdHandler,
     },
   ];

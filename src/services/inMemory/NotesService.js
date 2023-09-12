@@ -1,79 +1,79 @@
-const { nanoid } = require('nanoid');
-const InvariantError = require('../../exceptions/InvariantError');
-const NotFoundError = require('../../exceptions/NotFoundError');
-const { Pool } = require('pg');
-const mapDBToModel = require('../../utils');
+const { nanoid } = require('nanoid')
+const InvariantError = require('../../exceptions/InvariantError')
+const NotFoundError = require('../../exceptions/NotFoundError')
+const { Pool } = require('pg')
+const mapDBToModel = require('../../utils')
 
 class NotesService {
-  constructor() {
-    this._notes = [];
+  constructor () {
+    this._notes = []
     this._pool = new Pool()
   }
 
-  async addNote({ title, body, tags }) {
-    const id = nanoid(16);
-    const createdAt = new Date().toISOString();
-    const updatedAt = createdAt;
+  async addNote ({ title, body, tags }) {
+    const id = nanoid(16)
+    const createdAt = new Date().toISOString()
+    const updatedAt = createdAt
 
     const query = {
-      text : 'INSERT INTO notes VALUES($1,$2,$3,$4,$5,$6) RETURNING id',
-      values : [id, title, body, tags, createdAt, updatedAt]
+      text: 'INSERT INTO notes VALUES($1,$2,$3,$4,$5,$6) RETURNING id',
+      values: [id, title, body, tags, createdAt, updatedAt]
     }
 
     const result = await this._pool.query(query)
 
     if (!result.rows[0].id) {
-      throw new InvariantError('Catatan gagal ditambahkan');
+      throw new InvariantError('Catatan gagal ditambahkan')
     }
     return result.rows[0].id
   }
 
-  async getNotes() {
-    const result = await this._pool.query('SELECT * FROM notes');
+  async getNotes () {
+    const result = await this._pool.query('SELECT * FROM notes')
     return result.rows.map(mapDBToModel)
   }
 
-  async getNoteById(id) {
+  async getNoteById (id) {
     const query = {
-      text : 'SELECT * FROM notes WHERE id = $1',
-      values : [id]
+      text: 'SELECT * FROM notes WHERE id = $1',
+      values: [id]
     }
     const note = await this._pool.query(query)
     if (!note.rows.length) {
-      throw new NotFoundError('Catatan tidak ditemukan');
+      throw new NotFoundError('Catatan tidak ditemukan')
     }
-    return note.rows.map(mapDBToModel)[0];
+    return note.rows.map(mapDBToModel)[0]
   }
 
-  editNoteById(id, { title, body, tags }) {
-    const updatedAt = new Date().toISOString();
+  async editNoteById (id, { title, body, tags }) {
+    const updatedAt = new Date().toISOString()
     const query = {
-      text : 'UPDATE notes SET title = $1, body = $2, tags = $3, updatedAt = $4 WHERE id = $5',
-      values : [title, body, tags, updatedAt, id]
+      text: 'UPDATE notes SET title = $1, body = $2, tags = $3, updated_at = $4 WHERE id = $5 RETURNING id',
+      values: [title, body, tags, updatedAt, id]
     }
-    const index = this._pool.query(query)
+    const index = await this._pool.query(query)
 
     if (!index.rows.length) {
-      throw new NotFoundError('Gagal memperbarui catatan. Id tidak ditemukan');
+      throw new NotFoundError('Gagal memperbarui catatan. Id tidak ditemukan')
     }
-    const $$query = {
-      text : 'SELECT * FROM notes WHERE id = $1',
-      values : [id]
-    }
-    const find = this._pool.query($$query)
-    return find.rows.map(mapDBToModel)[0]
+    // const $$query = {
+    //   text : 'SELECT * FROM notes WHERE id = $1',
+    //   values : [id]
+    // }
+    // const find = await this._pool.query($$query)
+    // return find.rows.map(mapDBToModel)[0]
   }
 
-  deleteNoteById(id) {
+  async deleteNoteById (id) {
     const query = {
-      text : 'DELETE FROM notes WHERE id = $1',
-      values : [id]
+      text: 'DELETE FROM notes WHERE id = $1',
+      values: [id]
     }
-    const index = this._pool.query(query)
+    const index = await this._pool.query(query)
     if (!index.rows.length) {
-      throw new NotFoundError('Catatan gagal dihapus. Id tidak ditemukan');
-    } 
+      throw new NotFoundError('Catatan gagal dihapus. Id tidak ditemukan')
+    }
   }
 }
 
-module.exports = NotesService;
+module.exports = NotesService
