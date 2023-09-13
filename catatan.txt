@@ -11,3 +11,6 @@ npm run migrate create "create table notes" => membuat table baru
 Angka yang tertulis pada awal nama berkas migrasi adalah waktu epoch, jumlah milidetik yang terus bertambah sejak 1 Januari 1970. Setiap kali membuat migrasi angkanya akan terus bertambah, sehingga berkas migrasi yang Anda buat akan memiliki nilai berbeda di bagian awal nama berkasnya.
 
 Fakta mencengangkan:  Tahukah Anda? Menyiapkan pengujian di awal sebelum penulisan kode aplikasi merupakan kultur dalam pengembangan software. Kultur ini dikenal dengan nama “Test Driven Development (TDD)”.
+
+SELECT datname FROM pg_database; => untuk check database 
+psql --username ikhsandev --dbname notesapp/openmusic
