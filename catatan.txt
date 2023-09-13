@@ -14,3 +14,5 @@ Fakta mencengangkan:  Tahukah Anda? Menyiapkan pengujian di awal sebelum penulis
 
 SELECT datname FROM pg_database; => untuk check database 
 psql --username ikhsandev --dbname notesapp/openmusic
+
+Berdasarkan dokumentasi dari node-pg-migrate, untuk menambahkan kolom pada tabel yang sudah ada, kita bisa menggunakan perintah pgm.addColumn, dan untuk menghapusnya gunakan perintah pgm.dropColumn.
